@@ -6,7 +6,7 @@ import { cn } from "@/components/utils";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Weather Insights – Next.js Senior Demo",
+  title: "Weather Insights – Next.js",
   description: "SSR/CSR, Edge, caching, streaming, Server Actions, Tailwind",
   metadataBase: new URL("https://example.com")
 };

@@ -1,6 +1,3 @@
-# GitLab Pages CI/CD for static export of Next.js App Router project.
-# NOTE: GitLab Pages is static-only; SSR routes and Server Actions run only on a Node host.
-# This pipeline builds a static export suitable for Pages and preserves SSR code for real hosting.
 stages: [install, build, deploy]
 
 variables:
@@ -8,11 +5,8 @@ variables:
   NEXT_TELEMETRY_DISABLED: "1"
   PNPM_HOME: "/usr/local/share/pnpm"
   PATH: "$PNPM_HOME:$PATH"
-  # Set base path for assets, e.g. "/${CI_PROJECT_NAME}" for project pages
   NEXT_PUBLIC_BASE_PATH: "/${CI_PROJECT_NAME}"
-  # Use upstream APIs directly in static export
   NEXT_PUBLIC_USE_PROXY: "false"
-  # Enable export mode
   NEXT_PUBLIC_STATIC_EXPORT: "1"
 
 default:

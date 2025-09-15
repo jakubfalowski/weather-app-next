@@ -1,36 +1,90 @@
-# Weather Insights – Next.js Senior Demo
+# 🌦️ Weather Insights
 
-**Dual‑mode deployment**: Full SSR app for Node/Edge hosts + static export for **GitLab Pages**.
+Aplikacja demo w **Next.js 14 (App Router)** pokazująca:
+- **SSR i CSR** (Server Components + Client Components),
+- **wydajność** (dynamic import, cache, Suspense, optymistyczne UI),
+- **trwały stan użytkownika** (ulubione w localStorage),
+- **CI/CD na GitLab Pages** (static export).
 
-## Local dev
+## ✨ Funkcje
+
+- Wyszukiwanie miasta z debounce
+- Prognoza pogody (Open-Meteo API) z wykresami (Recharts)
+- Dodawanie miast do ulubionych (localStorage)
+- SSR (przy starcie w Node/Edge) i fallback **static export** (GitLab Pages)
+- Tailwind + Framer Motion (animacje, karty)
+- Error boundaries (`app/error.tsx`, `app/not-found.tsx`)
+
+---
+
+## 🚀 Uruchomienie
+
+### Dev
 ```bash
-pnpm i
-pnpm dev
+npm i
+npm dev
+# http://localhost:3000
 ```
 
-## Full SSR (recommended for real demo)
+### Produkcja (SSR)
 ```bash
-pnpm build && pnpm start
-# open http://localhost:3000
+npm build
+npm start
+# -> działa na .next/ (serwer Node/Edge)
 ```
 
-## GitLab Pages (static export)
-Pages is static-only. This repo supports a static build that keeps the UX working by doing client-side fetches directly to Open‑Meteo.
+### Static export (np. GitLab Pages)
+```bash
+npm run export
+npx serve out -l 3000
+# -> działa z out/ jako czysty static hosting
+```
 
-### CI/CD
-Pipeline is in `.gitlab-ci.yml` and:
-- builds with `NEXT_PUBLIC_STATIC_EXPORT=1` and `NEXT_PUBLIC_BASE_PATH="/$CI_PROJECT_NAME"`,
-- publishes `out/` as `public/` for Pages,
-- adds `.nojekyll`.
+---
 
-> SSR-only features (Server Actions, Edge route handlers) are disabled in export build but remain in the codebase for real hosting.
+## Stack
 
-## Env toggles
-- `NEXT_PUBLIC_STATIC_EXPORT=1` → \tStatic export build (GitLab Pages)
-- `NEXT_PUBLIC_BASE_PATH="/<project>"` → \tBase path for Pages assets
-- `NEXT_PUBLIC_USE_PROXY=true` → \tRoute client fetches via `/api/*` (Edge, with cache). Set to `false` on Pages.
+- **Next.js 14** (App Router, Server Components, Route Handlers)
+- **TypeScript** z restrykcyjnym typowaniem
+- **TailwindCSS** + **lucide-react** ikony
+- **Recharts** (dynamic import wykresu)
+- **Framer Motion** (animacje klientowe)
+- **localStorage** do zarządzania ulubionymi
+- **npm** jako package manager
 
-## Tech highlights
-- App Router (Server + Client Components), Suspense/streaming
-- Server Actions (cookies), Edge Route Handlers, ISR (`revalidate`)
-- Tailwind, Recharts (dynamic import), SWR
+---
+
+## 📂 Struktura
+
+```
+app/
+ ├─ page.tsx             # landing page z wyszukiwarką + ulubione
+ ├─ city/[name]/page.tsx # strona miasta z prognozą
+ ├─ error.tsx            # globalny error boundary
+ └─ not-found.tsx        # 404
+
+components/
+ ├─ CitySearch.tsx       # wyszukiwarka z debounce
+ ├─ FavoriteToggle.tsx   # przycisk dodaj/usuń z ulubionych (localStorage)
+ ├─ Favorites.client.tsx # lista ulubionych (client-only)
+ ├─ Chart.tsx            # wykres temperatur
+ └─ Hero.tsx             # animowana sekcja (Framer Motion)
+
+lib/
+ └─ types.ts             # typy ForecastResponse
+```
+
+---
+
+## ⚙️ CI/CD (GitLab Pages)
+
+- `.gitlab-ci.yml` zawiera pipeline:
+  - `install` → `build` → `pages`
+- Static export publikowany do `public/`
+- Obsługuje basePath (`/$CI_PROJECT_NAME`) dla GitLab Pages
+
+---
+
+## 📝 Licencja
+
+MIT — do dowolnego użytku i dalszego rozwijania 🚀
