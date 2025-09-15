@@ -1,0 +1,57 @@
+# GitLab Pages CI/CD for static export of Next.js App Router project.
+# NOTE: GitLab Pages is static-only; SSR routes and Server Actions run only on a Node host.
+# This pipeline builds a static export suitable for Pages and preserves SSR code for real hosting.
+stages: [install, build, deploy]
+
+variables:
+  NODE_ENV: "production"
+  NEXT_TELEMETRY_DISABLED: "1"
+  PNPM_HOME: "/usr/local/share/pnpm"
+  PATH: "$PNPM_HOME:$PATH"
+  # Set base path for assets, e.g. "/${CI_PROJECT_NAME}" for project pages
+  NEXT_PUBLIC_BASE_PATH: "/${CI_PROJECT_NAME}"
+  # Use upstream APIs directly in static export
+  NEXT_PUBLIC_USE_PROXY: "false"
+  # Enable export mode
+  NEXT_PUBLIC_STATIC_EXPORT: "1"
+
+default:
+  image: node:20-alpine
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - .pnpm-store
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@9 --activate
+    - pnpm config set store-dir .pnpm-store
+    - pnpm i --frozen-lockfile=false
+
+install:
+  stage: install
+  script: echo "Dependencies installed"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
+build:
+  stage: build
+  script:
+    - pnpm build
+    - mkdir -p public
+    - cp -r out/* public/
+    - touch public/.nojekyll
+  artifacts:
+    paths:
+      - public
+  needs: ["install"]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+
+pages:
+  stage: deploy
+  script: echo "Deploying to GitLab Pages"
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"
